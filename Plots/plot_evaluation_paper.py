@@ -13,33 +13,16 @@ from tueplots import bundles, figsizes, fontsizes, cycler
 import warnings
 warnings.filterwarnings('ignore')
 
-# Try to import palettes, use fallback if not available
-try:
-    from tueplots import palettes
-    TUEBINGEN_COLORS = palettes.tue_plot
-except ImportError:
-    try:
-        from tueplots.constants import palettes
-        TUEBINGEN_COLORS = palettes.tue_plot
-    except ImportError:
-        # Fallback Tübingen-style colors if palettes not available
-        TUEBINGEN_COLORS = ['#A51E37', '#00749E', '#C4071B', '#009A93', '#E2001A', '#4B4B4D']
+TUEBINGEN_COLORS = ['#A51E37', '#00749E', '#C4071B', '#009A93', '#E2001A', '#4B4B4D']
 
-# Configure matplotlib for paper style with tueplots
-plt.rcParams.update(bundles.icml2022())
-plt.rcParams.update(figsizes.icml2022_half())
 plt.rcParams.update(fontsizes.icml2022())
-
-# Use University of Tübingen-style colors (fallback implementation)
 plt.rcParams.update(cycler.cycler(color=TUEBINGEN_COLORS))
 
-# Disable LaTeX to avoid system dependency issues
 plt.rcParams.update({
     'text.usetex': False,
     'mathtext.default': 'regular'
 })
 
-# Additional paper-style configuration
 PAPER_CONFIG = {
     'axes.linewidth': 2.0,       # Thick borders
     'lines.linewidth': 1.0,      # Thick lines
@@ -52,7 +35,6 @@ PAPER_CONFIG = {
     'axes.edgecolor': 'black',   # Black borders
     'figure.facecolor': 'white',
     'axes.facecolor': 'white',
-    # Serif fonts for academic papers
     'font.family': 'serif',
     'font.serif': ['Times New Roman', 'Times', 'DejaVu Serif', 'serif'],
 }
@@ -75,7 +57,6 @@ class PaperStyleEvaluationComparison:
         self.output_dir = Path(output_dir) if output_dir else Path("./output")
         self.output_dir.mkdir(exist_ok=True)
         
-        # University of Tübingen color scheme (using fallback colors)
         self.model_colors = {
             'PtV-1': TUEBINGEN_COLORS[0],      # First Tübingen color
             'PtV-3': TUEBINGEN_COLORS[1],      # Second Tübingen color  
@@ -214,10 +195,7 @@ class PaperStyleEvaluationComparison:
         for model_name, (log_path, log_format) in models.items():
             full_path = self.data_dir / log_path
             if not full_path.exists():
-                print(f"Evaluation log not found for {model_name}: {full_path}")
                 continue
-            
-            print(f"Loading evaluation data for {model_name}...")
             
             try:
                 if log_format == 'pointcept':
@@ -232,15 +210,9 @@ class PaperStyleEvaluationComparison:
                     'classes': class_results
                 }
                 
-                if overall_metrics:
-                    print(f"  Overall metrics - mIoU: {overall_metrics.get('mIoU', 'N/A'):.4f}")
-                print(f"  Loaded {len(class_results)} class results")
-                
             except Exception as e:
-                print(f"Error parsing {model_name}: {e}")
+                pass
         
-        print(f"Successfully loaded evaluation data for {len(self.evaluation_data)} models")
-    
     def plot_overall_metrics_comparison(self):
         """Plot overall metrics comparison - paper style."""
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(figsizes.icml2022_half()['figure.figsize'][0] * 1.5, figsizes.icml2022_half()['figure.figsize'][1]))
@@ -311,54 +283,6 @@ class PaperStyleEvaluationComparison:
         
         return fig
     
-    def plot_per_class_iou_comparison(self):
-        """Plot per-class IoU comparison - paper style."""
-        fig, ax = plt.subplots(figsize=(figsizes.icml2022_half()['figure.figsize'][0] * 1.5, figsizes.icml2022_half()['figure.figsize'][1]))
-        
-        # Prepare data for grouped bar chart
-        models = list(self.evaluation_data.keys())
-        n_models = len(models)
-        n_classes = len(self.class_names)
-        
-        # Create matrix of IoU values
-        iou_matrix = np.zeros((n_models, n_classes))
-        
-        for i, model_name in enumerate(models):
-            class_data = self.evaluation_data[model_name]['classes']
-            for class_result in class_data:
-                class_id = class_result['class_id']
-                if class_id < n_classes:
-                    iou_matrix[i, class_id] = class_result['iou']
-        
-        # Set up the bar positions
-        x = np.arange(n_classes)
-        width = 0.8 / n_models
-        
-        # Plot bars for each model
-        for i, model_name in enumerate(models):
-            offset = (i - n_models/2 + 0.5) * width
-            bars = ax.bar(x + offset, iou_matrix[i], width, 
-                         label=model_name, 
-                         color=self.model_colors[model_name],
-                         alpha=0.7,
-                         edgecolor='black',
-                         linewidth=1.5)
-        
-        ax.set_title("Per-Class IoU Performance Comparison")
-        ax.set_xlabel("Object Classes (S3DIS Dataset)")
-        ax.set_ylabel("Intersection over Union (IoU)")
-        ax.set_xticks(x)
-        ax.set_xticklabels(self.class_names, rotation=45, ha='right')
-        ax.legend(frameon=True, fancybox=False, edgecolor='black')
-        ax.grid(True, alpha=0.3, axis='y')
-        ax.set_ylim(0, 1.0)
-        
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "paper_multi_model_per_class_iou.pdf", 
-                   dpi=300, bbox_inches='tight')
-        plt.show()
-        
-        return fig
     
     def plot_architecture_performance_heatmap(self):
         """Create a heatmap showing performance across classes and models - paper style."""
@@ -411,98 +335,8 @@ class PaperStyleEvaluationComparison:
         plt.show()
         
         return fig
-    
-    def plot_architecture_ranking_summary(self):
-        """Create a ranking summary - paper style."""
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsizes.icml2022_half()['figure.figsize'])
-        
-        # Calculate average performance per model
-        model_avg_ious = {}
-        for model_name, data in self.evaluation_data.items():
-            class_ious = [c['iou'] for c in data['classes']]
-            model_avg_ious[model_name] = np.mean(class_ious)
-        
-        # Sort models by performance
-        sorted_models = sorted(model_avg_ious.items(), key=lambda x: x[1], reverse=True)
-        
-        # 1. Model ranking by average IoU
-        models, avg_ious = zip(*sorted_models)
-        colors = [self.model_colors[m] for m in models]
-        
-        bars = ax1.bar(models, avg_ious, color=colors, alpha=0.7, 
-                      edgecolor='black', linewidth=2)
-        for bar, value in zip(bars, avg_ious):
-            height = bar.get_height()
-            ax1.text(bar.get_x() + bar.get_width()/2., height + 0.005,
-                    f'{value:.3f}', ha='center', va='bottom', 
-                    fontsize=8)
-        
-        ax1.set_title("Architecture Ranking")
-        ax1.set_ylabel("Average IoU")
-        ax1.set_ylim(0, max(avg_ious) * 1.15)
-        ax1.grid(True, alpha=0.3, axis='y')
-        ax1.tick_params(axis='x', rotation=45)
-        
-        # 2. Performance consistency (standard deviation)
-        model_std = {}
-        for model_name, data in self.evaluation_data.items():
-            class_ious = [c['iou'] for c in data['classes']]
-            model_std[model_name] = np.std(class_ious)
-        
-        models = list(model_std.keys())
-        stds = list(model_std.values())
-        colors = [self.model_colors[m] for m in models]
-        
-        bars = ax2.bar(models, stds, color=colors, alpha=0.7, 
-                      edgecolor='black', linewidth=2)
-        for bar, value in zip(bars, stds):
-            height = bar.get_height()
-            ax2.text(bar.get_x() + bar.get_width()/2., height + 0.002,
-                    f'{value:.3f}', ha='center', va='bottom', 
-                    fontsize=8)
-        
-        ax2.set_title("Performance Consistency")
-        ax2.set_ylabel("IoU Standard Deviation")
-        ax2.grid(True, alpha=0.3, axis='y')
-        ax2.tick_params(axis='x', rotation=45)
-        
-        plt.tight_layout()
-        plt.savefig(self.output_dir / "paper_multi_model_ranking_summary.pdf", 
-                   dpi=300, bbox_inches='tight')
-        plt.show()
-        
-        return fig
-    
-    def generate_all_paper_plots(self):
-        """Generate all paper-style comparison plots."""
-        print("Loading evaluation data for all models...")
-        self.load_all_evaluation_data()
-        
-        if not self.evaluation_data:
-            print("No evaluation data found!")
-            return
-        
-        print(f"Generating paper-style comparison plots for {len(self.evaluation_data)} models...")
-        
-        self.plot_overall_metrics_comparison()
-        print("✓ Paper-style overall metrics comparison plot saved")
-        
-        self.plot_per_class_iou_comparison()
-        print("✓ Paper-style per-class IoU comparison plot saved")
-        
-        self.plot_architecture_performance_heatmap()
-        print("✓ Paper-style performance heatmap plot saved")
-        
-        self.plot_architecture_ranking_summary()
-        print("✓ Paper-style architecture ranking summary plot saved")
-        
-        print(f"\nAll paper-style comparison plots saved to: {self.output_dir}")
-        print("\nGenerated plots:")
-        print("  - paper_multi_model_overall_comparison.pdf")
-        print("  - paper_multi_model_per_class_iou.pdf")
-        print("  - paper_multi_model_performance_heatmap.pdf")
-        print("  - paper_multi_model_ranking_summary.pdf")
 
+    
 
 def main():
     """Main function to run the paper-style evaluation comparison script."""
@@ -513,10 +347,14 @@ def main():
     # Create comparison instance
     comparator = PaperStyleEvaluationComparison(data_dir, output_dir)
     
-    # Generate all comparison plots
-    comparator.generate_all_paper_plots()
+    # Load data and generate plots directly
+    comparator.load_all_evaluation_data()
     
-    print("\nPaper-style multi-model evaluation comparison complete!")
+    if not comparator.evaluation_data:
+        return
+    
+    comparator.plot_overall_metrics_comparison()
+    comparator.plot_architecture_performance_heatmap()
 
 
 if __name__ == "__main__":
