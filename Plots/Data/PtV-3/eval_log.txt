@@ -1,0 +1,15 @@
+[2025-07-17 21:47:22,370 INFO test.py line 340 2683537] Val result: mIoU/mAcc/allAcc 0.7171/0.7609/0.9121
+[2025-07-17 21:47:22,370 INFO test.py line 346 2683537] Class_0 - ceiling Result: iou/accuracy 0.9284/0.9510
+[2025-07-17 21:47:22,370 INFO test.py line 346 2683537] Class_1 - floor Result: iou/accuracy 0.9849/0.9913
+[2025-07-17 21:47:22,370 INFO test.py line 346 2683537] Class_2 - wall Result: iou/accuracy 0.8498/0.9768
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_3 - beam Result: iou/accuracy 0.0000/0.0000
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_4 - column Result: iou/accuracy 0.2967/0.3118
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_5 - window Result: iou/accuracy 0.6355/0.6503
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_6 - door Result: iou/accuracy 0.7885/0.8400
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_7 - table Result: iou/accuracy 0.8307/0.8995
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_8 - chair Result: iou/accuracy 0.9297/0.9641
+[2025-07-17 21:47:22,371 INFO test.py line 346 2683537] Class_9 - sofa Result: iou/accuracy 0.7920/0.8121
+[2025-07-17 21:47:22,372 INFO test.py line 346 2683537] Class_10 - bookcase Result: iou/accuracy 0.7980/0.8757
+[2025-07-17 21:47:22,372 INFO test.py line 346 2683537] Class_11 - board Result: iou/accuracy 0.8465/0.8542
+[2025-07-17 21:47:22,372 INFO test.py line 346 2683537] Class_12 - clutter Result: iou/accuracy 0.6412/0.7652
+[2025-07-17 21:47:22,372 INFO test.py line 354 2683537] <<<<<<<<<<<<<<<<< End Evaluation <<<<<<<<<<<<<<<<<

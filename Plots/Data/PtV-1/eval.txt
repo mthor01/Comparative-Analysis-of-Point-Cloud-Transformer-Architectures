@@ -1,0 +1,17 @@
+allAcc 0.8804
+mIoU 0.6438
+mAcc 0.7181
+
+Class_0 - ceiling IoU 0.9298
+Class_1 - floor IoU 0.9822
+Class_2 - wall IoU 0.8171
+Class_3 - beam IoU 0.0000
+Class_4 - column IoU 0.4472
+Class_5 - window IoU 0.5381
+Class_6 - door IOU 0.5365
+Class_7 - table IoU 0.8002
+Class_8 - chair IoU 0.8883
+Class_9 - sofa IoU 0.5189
+Class_10 - bookcase IoU 0.6947
+Class_11 - board IoU 0.6991
+Class_12 - clutter IoU 0.5169
